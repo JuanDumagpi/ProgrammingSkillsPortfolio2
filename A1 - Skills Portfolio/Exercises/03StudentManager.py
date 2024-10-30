@@ -11,7 +11,17 @@ with open ('studentMarks.txt') as file:
         data = line.strip().split(',') #takes out all the \n and separates the data into lines, and then each line into comma separated substrings
         database.append(data[0:])
 
-
+databaseUnsorted = database.copy()
+cMarkSorted = []
+for i in range(len(databaseUnsorted)):
+    sample = databaseUnsorted[0]
+    for x in databaseUnsorted:
+        if x[2]+x[3] < sample[2]+sample[3]:
+            sample = x
+    cMarkSorted.append(sample)
+    databaseUnsorted.remove(sample)
+    
+cMarkSort=cMarkSorted[::-1]
 
 
 root = Tk()
