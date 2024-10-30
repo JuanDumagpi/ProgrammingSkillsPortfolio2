@@ -3,6 +3,9 @@
 """
 from tkinter import *
 from tkinter import ttk
+
+
+#list of lists that recieves the data from txt file
 database = []
 
 with open ('studentMarks.txt') as file:
@@ -16,19 +19,26 @@ sortedByTotalM = database.copy()
 sortedByTotalMReverse = database.copy()
 sortedByTotalM.sort(key=lambda x: int(x[2]+x[3])) #ascending
 sortedByTotalMReverse.sort(key=lambda x: int(x[2]+x[3]), reverse=True) #descending
+
 #sort by name
 sortedByName = database.copy()
 sortedByName.sort(key=lambda x: x[1])
 
 root = Tk()
 root.title("Student Database")
-root.geometry("800x600")
 
-myTree = ttk.Treeview(root)
+#top frame for better layout
+topFrame = Frame(root)
+topFrame.pack(side = TOP)
+#this is the Treeview widget
+myTree = ttk.Treeview(topFrame)
+myTree.grid(row=0, column=0, pady=12)
 
+#the columns for Treeview
 myTree['columns']=("ID","Name","cMark","eMark","oPerc","sGrade")
 columns=myTree['columns']
 
+#the variables for Treeview
 myTree.column("#0", width=0, stretch=NO)
 myTree.column("ID", anchor=CENTER, width=100)
 myTree.column("Name", anchor=W, width=200)
@@ -37,6 +47,7 @@ myTree.column("eMark", anchor=CENTER, width=100)
 myTree.column("oPerc", anchor=CENTER, width=100)
 myTree.column("sGrade", anchor=CENTER, width=100)
 
+#the heading names for Treeview
 myTree.heading("#0", text="", anchor=W)
 myTree.heading("ID", text="Student Number", anchor=CENTER, command=lambda c=columns: sortTree(myTree, c, False))
 myTree.heading("Name", text="Student Name", anchor=W)
@@ -110,11 +121,8 @@ def placeDataMarksR():
             grade = " F"
         myTree.insert(parent='', index='end', iid=count, text="", values=(record[0], record[1], record[2], record[3], record[4] + "%", record[5] + grade))
         count+=1
-    
-myTree.pack(pady=20)
-lenLabel=Label(root, text=studentTotal)
-lenLabel.pack()
-#Rearranges the treeview list based on the typed input in the entry box by Name
+
+#Rearranges the treeview list based on the typed input in the entry box by Name and places that item on the very top
 def filterName(*args):
     items=myTree.get_children()
     search = searchVar.get()
@@ -124,19 +132,38 @@ def filterName(*args):
             myTree.delete(eachItem)
             myTree.insert("",0,values=search_var)
 
-searchVar = StringVar()
-searchEntry = Entry(root, textvariable=searchVar)
-searchEntry.pack()
-searchVar.trace("w", filterName)
 
-button1=Button (root, text="Sort By Name", command=placeData)
-button2=Button (root, text="Sort By Highest Total Marks", command=placeDataMarksR)
-button3=Button (root, text="Sort By Lowest Total Marks", command=placeDataMarks)
-button1.pack()
-button2.pack()
-button3.pack()
+
+#Label for total number of database entries
+lenLabel=Label(topFrame, text=("Total entries in database: " + studentTotal))
+lenLabel.grid(row=1, column=0)
+
+#middle frame
+midFrame = Frame(root)
+midFrame.pack()
+
+#search bar for filtering based on name
+searchVar = StringVar()
+searchEntry = Entry(midFrame, textvariable=searchVar)
+searchEntry.grid(row=0, column=0, padx=8, pady=12)
+
+buttonSearch=Button(midFrame, text="Filter by Name", command=filterName)
+buttonSearch.grid(row=0, column=1, padx=8, pady=12)
+
+#bottom frame
+botFrame = Frame(root)
+botFrame.pack()
+
+#buttons to execute functions
+button1=Button (botFrame, text="Sort By Name", command=placeData)
+button2=Button (botFrame, text="Sort By Highest Total Marks", command=placeDataMarksR)
+button3=Button (botFrame, text="Sort By Lowest Total Marks", command=placeDataMarks)
+button1.grid(row=0, column=0, padx=8, pady=12)
+button2.grid(row=0, column=1, padx=8, pady=12)
+button3.grid(row=0, column=2, padx=8, pady=12)
 #-----------------------------------------------------------------------------------#
 
-
+#calls the method to place things into treeview
 placeData()
+#executes the program loop
 root.mainloop()
